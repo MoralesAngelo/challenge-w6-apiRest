@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "name": "Angelo",
+    "email": "angelo@example.com",
+    "live": true
+  },
+
+  {
+    "id": "2",
+    "name": "Fran",
+    "email": "fran@example.com",
+    "live": true
+  },
+  {
+    "id": "3",
+    "name": "Raul",
+    "email": "raul@example.com",
+    "live": true
+  },
+  {
+    "id": "4",
+    "name": "alberto",
+    "email": "alberto@example.com"
+  },
+  {
+    "id": "5",
+    "name": "Diego",
+    "email": "diego@example.com",
+    "live": true
+  },
+  {
+    "id": "6",
+    "name": "Antonio",
+    "email": "antonio@example.com",
+    "live": true
+  }
+]

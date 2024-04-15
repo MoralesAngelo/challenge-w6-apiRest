@@ -1,13 +1,13 @@
 {
-  "name": "Week6_Express",
+  "name": "Week7",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=prod dist/index.js",
-    "start:dev": "cross-env DEBUG=W6* NODE_ENV=dev PORT=3500 node --watch --env-file=.env dist/index.js",
-    "start:mon": "cross-env DEBUG=W6* NODE_ENV=dev PORT=3500 nodemon dist/index.js",
+    "start:dev": "cross-env DEBUG=W7* NODE_ENV=dev PORT=3500 node --watch --env-file=.env dist/index.js",
+    "start:mon": "cross-env DEBUG=W7* NODE_ENV=dev PORT=3500 nodemon dist/index.js",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "cross-env NODE_ENV=test jest",
@@ -43,6 +43,7 @@
     "debug": "^4.3.4",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "joi": "^17.12.3",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.0"
   }

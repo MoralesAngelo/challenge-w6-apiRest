@@ -1,12 +1,12 @@
 import { createServer } from 'http';
 import 'dotenv/config';
-import { app } from './app.js';
+import { createApp } from './app.js';
 import createDebug from 'debug';
 
-const debug = createDebug('W6*:server');
-
-const port = process.env.PORT ?? 3500;
-const server = createServer(app);
+const debug = createDebug('W7*:server');
+debug('staring server');
+const port = process.env.PORT ?? 3500; // en el package json se le asigna el puerto (opcional)
+const server = createServer(createApp()); // montamos server
 server.listen(port);
 
 server.on('error', (error) => {

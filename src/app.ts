@@ -1,17 +1,25 @@
 import express from 'express';
-import createDebug from 'debug';
-import { userRouter } from './routers/user.router.js';
-export const app = express();
+import morgan from 'morgan';
+import cors from 'cors';
+import { usersRouter } from './routers/users.router.js';
+import { UsersFsRepository } from './repositories/users.fs.repo.js';
+import { UserController } from './controllers/user.controllers.js';
 
-const debug = createDebug('W6E:app');
+export const createApp = () => {
+  const app = express();
 
-debug('Starting app');
+  app.use(express.json());
 
-app.use(express.json());
-app.use(express.static('public'));
-app.use((req, res, next) => {
-  debug('Request received');
-  next();
-});
+  app.use(morgan('dev'));
 
-app.use('/user', userRouter);
+  app.use(cors());
+
+  app.use(express.static('public')); // accede al carpeta indicada 'public'
+
+  const userRepo = new UsersFsRepository();
+  const userController = new UserController(userRepo);
+  const userRouter = new usersRouter(userController);
+  app.use('/users', userRouter.router);
+
+  return app;
+};
