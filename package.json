@@ -1,24 +1,25 @@
 {
-  "name": "Week7",
+  "name": "challenge-w7-1",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "start": "cross-env NODE_ENV=prod dist/index.js",
-    "start:dev": "cross-env DEBUG=W7* NODE_ENV=dev PORT=3500 node --watch --env-file=.env dist/index.js",
-    "start:mon": "cross-env DEBUG=W7* NODE_ENV=dev PORT=3500 nodemon dist/index.js",
-    "build": "tsc",
-    "dev": "tsc -w",
-    "test": "cross-env NODE_ENV=test jest",
-    "lint": "eslint . --ext .ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "prettier": {
     "singleQuote": true
   },
+  "scripts": {
+    "start": "cross-env NODE_ENV=prod node dist/index.js",
+    "start:dev": "cross-env DEBUG=W7E* cross-env NODE_ENV=dev cross-env PORT=3400 node --env-file=.env --watch dist/index.js",
+    "start:mon": "cross-env DEBUG=W7E* cross-env NODE_ENV=dev cross-env PORT=3000 nodemon dist/index.js",
+    "build": "npm install && tsc -p . --outDir dist",
+    "dev": "tsc -w",
+    "test": "jest",
+    "test:dev": "cross-env NODE_ENV=test jest --watchAll --coverage",
+    "lint": "eslint . --ext .ts",
+    "prepare": "husky"
+  },
+  "author": "Diego",
+  "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/debug": "^4.1.12",
@@ -28,6 +29,7 @@
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-xo": "^0.44.0",
@@ -43,6 +45,7 @@
     "debug": "^4.3.4",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "husky": "^9.0.11",
     "joi": "^17.12.3",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.0"

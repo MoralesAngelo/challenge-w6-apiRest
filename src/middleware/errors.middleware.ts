@@ -29,6 +29,7 @@ export class ErrorsMiddleware {
       return;
     }
 
+    debug('request received', error.message);
     res.status(500);
     res.json({
       status: '500 internal server error',
