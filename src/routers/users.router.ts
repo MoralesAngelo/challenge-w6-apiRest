@@ -1,13 +1,17 @@
 import { Router as router } from 'express';
 import { type UserController } from '../controllers/user.controllers';
 import createDebug from 'debug';
+import { AuthInterceptor } from '../middleware/auth.interceptor';
 
 const debug = createDebug('W6*:router');
 
-export class usersRouter {
+export class UsersRouter {
   router = router();
 
-  constructor(private readonly controller: UserController) {
+  constructor(
+    private readonly controller: UserController,
+    readonly authInterceptor: AuthInterceptor
+  ) {
     debug('instantiated sport router');
     this.router.get('/', controller.getAll.bind(controller));
     this.router.get('/:id', controller.getById.bind(controller));

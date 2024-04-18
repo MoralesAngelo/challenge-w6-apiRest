@@ -1,14 +1,16 @@
 import express, { type Express } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import { usersRouter } from './routers/users.router.js';
-// import { UsersFsRepository } from './repositories/users.fs.repo.js';
+import { UsersRouter } from './routers/users.router.js';
 import { UserController } from './controllers/user.controllers.js';
-import { PrismaClient } from '@prisma/client';
+import { type PrismaClient } from '@prisma/client';
 import { UsersSqlRepo } from './repositories/users.sql.repo.js';
 import { ErrorsMiddleware } from './middleware/errors.middleware.js';
 import { error } from 'console';
 import { CardSqlRepo } from './repositories/cards.sql.repo.js';
+import { AuthInterceptor } from './middleware/auth.interceptor.js';
+import { CardsController } from './controllers/card.controllers.js';
+import { CardRouter } from './routers/cards.router.js';
 
 export const createApp = () => {
   return express();
@@ -20,15 +22,17 @@ export const startApp = (app: Express, prisma: PrismaClient) => {
   app.use(cors());
   app.use(express.static('public')); // accede al carpeta indicada 'public'
 
-  // const cardRepo = new CardSqlRepo(prisma);
-  // const cardController = new cardController(cardRepo);
-  // const cardRouter = new cardRouter(cardController);
-  // app.use('/cards', cardRouter.router);
+  const authInterceptor = new AuthInterceptor();
 
-  const userRepo = new UsersSqlRepo(prisma);
-  const userController = new UserController(userRepo);
-  const userRouter = new usersRouter(userController);
-  app.use('/users', userRouter.router);
+  const cardsRepo = new CardSqlRepo(prisma);
+  const cardsController = new CardsController(cardsRepo);
+  const cardsRouter = new CardRouter(cardsController, authInterceptor);
+  app.use('/cards', cardsRouter.router);
+
+  const usersRepo = new UsersSqlRepo(prisma);
+  const usersController = new UserController(usersRepo);
+  const usersRouter = new UsersRouter(usersController, authInterceptor);
+  app.use('/users', usersRouter.router);
 
   const errorMiddleware = new ErrorsMiddleware();
   app.use(errorMiddleware.handle.bind(errorMiddleware));

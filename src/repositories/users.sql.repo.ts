@@ -1,19 +1,39 @@
 import { type PrismaClient } from '@prisma/client';
-import createDebug from 'debug';
 import { HttpError } from '../middleware/errors.middleware.js';
 import { type UserCreateDto, type User } from '../entities/user.js';
-import { type Repo } from './type.repo.js';
-const debug = createDebug('W7E:articles:repository:sql');
+import { type WithLoginRepo } from './type.repo.js';
 
 const select = {
   id: true,
   name: true,
   email: true,
+  password: true,
 };
 
-export class UsersSqlRepo implements Repo<User, UserCreateDto> {
-  constructor(private readonly prisma: PrismaClient) {
-    debug('Instantiated articles fs repository');
+export class UsersSqlRepo implements WithLoginRepo<User, UserCreateDto> {
+  constructor(private readonly prisma: PrismaClient) {}
+  async searchForLogin(key: 'name' | 'email', value: string) {
+    if (!['email', 'name'].includes(key)) {
+      throw new HttpError(404, 'Not Found', 'Invalid query parameters');
+    }
+
+    const userData = await this.prisma.user.findFirst({
+      where: {
+        [key]: value,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+      },
+    });
+
+    if (!userData) {
+      throw new HttpError(404, 'Not Found', `Invalid ${key} or password`);
+    }
+
+    return userData;
   }
 
   async readAll() {
