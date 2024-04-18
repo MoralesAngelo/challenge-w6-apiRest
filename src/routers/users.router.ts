@@ -1,11 +1,11 @@
-import { Router as createRouter } from 'express';
-import { type UserController } from '../controllers/user.controllers.js';
+import { Router as router } from 'express';
+import { type UserController } from '../controllers/user.controllers';
 import createDebug from 'debug';
 
 const debug = createDebug('W6*:router');
 
 export class usersRouter {
-  router = createRouter();
+  router = router();
 
   constructor(private readonly controller: UserController) {
     debug('instantiated sport router');

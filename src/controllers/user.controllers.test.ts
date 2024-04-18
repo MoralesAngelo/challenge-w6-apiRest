@@ -1,6 +1,6 @@
 import { type Response, type Request } from 'express';
 import { type UsersFsRepository } from '../repositories/users.fs.repo.js';
-import { UserController } from './user.controllers.js';
+import { BaseController } from './Base.controllers.js';
 import { HttpError } from '../middleware/errors.middleware';
 import { type User } from '../entities/user';
 import { error } from 'console';

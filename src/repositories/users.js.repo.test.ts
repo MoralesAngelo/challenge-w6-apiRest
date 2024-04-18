@@ -72,7 +72,7 @@ describe('Given an instance of the class ArticleFsRepo', () => {
           name: '',
           email: '',
         })
-      ).rejects.toThrow(new HttpError(404, 'Not Found', 'Song 2 not found'));
+      ).rejects.toThrow(new HttpError(404, 'Not Found', 'user 2 not found'));
     });
   });
 

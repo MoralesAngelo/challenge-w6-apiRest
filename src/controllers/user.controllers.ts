@@ -1,85 +1,85 @@
-import { type NextFunction, type Request, type Response } from 'express';
-import createDebug from 'debug';
-import { HttpError } from '../middleware/errors.middleware.js';
-import { UsersFsRepository } from '../repositories/users.fs.repo.js';
-import { type User, type UserCreateDto } from '../entities/user.js';
+import { BaseController } from './Base.controllers.js';
+import { type UserCreateDto, type User } from '../entities/user.js';
 import {
   userCreateDtoSchema,
   userUpdateDtoSchema,
 } from '../entities/user.schema.js';
+import { type WithLoginRepo } from '../repositories/type.repo.js';
+import {
+  type NextFunction,
+  type Request,
+  type Response,
+} from 'express-serve-static-core';
+import { HttpError } from '../middleware/errors.middleware.js';
+import { Auth } from '../services/auth.services.js';
 
-const debug = createDebug('W6:controller');
-
-export class UserController {
-  constructor(private readonly repo: UsersFsRepository) {
-    debug('instantiated controller');
+export class UserController extends BaseController<User, UserCreateDto> {
+  constructor(protected readonly repo: WithLoginRepo<User, UserCreateDto>) {
+    super(repo, userCreateDtoSchema, userUpdateDtoSchema);
   }
 
-  async getAll(req: Request, res: Response, next: NextFunction) {
-    try {
-      const result = this.repo.readAll();
-      res.json(result);
-    } catch (error) {
-      next(error);
+  async login(req: Request, res: Response, next: NextFunction) {
+    const { email, name, password } = req.body as UserCreateDto;
+
+    if ((!email && !name) || !password) {
+      next(
+        new HttpError(
+          400,
+          'bad, request',
+          'email/name and pasword are required'
+        )
+      );
+      return;
     }
-  }
 
-  async getById(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
+    const error = new HttpError(
+      401,
+      'Unauthorized',
+      'Email/name and password invalid'
+    );
+
     try {
-      const result = this.repo.readById(id);
-      res.json(result);
+      const user = await this.repo.searchForLogin(
+        email ? 'email' : 'name',
+        email || name
+      );
+
+      if (!user) {
+        next(error);
+        return;
+      }
+
+      if (!(await Auth.compare(password, user.password!))) {
+        next(error);
+        return;
+      }
+
+      const token = Auth.signJwt({ id: user.id! });
+      res.status(200).json({ token });
     } catch (error) {
       next(error);
     }
   }
 
   async create(req: Request, res: Response, next: NextFunction) {
-    const data = req.body as User;
-    const {
-      error,
-
-      value,
-    }: { error: Error | undefined; value: UserCreateDto } =
-      userCreateDtoSchema.validate(data, { abortEarly: false });
-    if (error) {
-      next(new HttpError(406, 'Not Acceptable', error.message));
+    if (!req.body.password || typeof req.body.password !== 'string') {
+      next(
+        new HttpError(
+          400,
+          'Bad Request',
+          'Password is required and must be a string'
+        )
+      );
       return;
     }
-    try {
-      const result = await this.repo.create(data);
-      res.status(201);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
+
+    req.body.password = await Auth.hash(req.body.password as string);
+    await super.create(req, res, next);
   }
 
   async update(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
-    const data = req.body as User;
-    const { error } = userUpdateDtoSchema.validate(data, {
-      abortEarly: false,
-    });
-    if (error) {
-      next(new HttpError(406, 'Not Acceptable', error.message));
-      return;
-    }
-    try {
-      const result = await this.repo.update(id, data);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async delete(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
-    try {
-      const result = await this.repo.delete(id);
-      res.json(result);
-    } catch (error) {
-      next(error);
+    if (req.body.password && typeof req.body.password === 'string') {
+      req.body.password = await Auth.hash(req.body.password as string);
     }
   }
 }
